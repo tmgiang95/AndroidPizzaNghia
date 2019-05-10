@@ -6,6 +6,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
@@ -19,7 +20,7 @@ import com.facebook.accountkit.ui.LoginType;
 
 public class MainActivity extends AppCompatActivity {
     public static int APP_REQUEST_CODE = 99;
-    RelativeLayout rlGoFrame;
+    LinearLayout rlGoFrame;
     ProgressDialog pd;
 
     @Override
