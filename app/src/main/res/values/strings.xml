@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Pizza</string>
+    <string name="facebook_app_id">321845908485447</string> <string name="fb_login_protocol_scheme">fb321845908485447</string>
+    <string name="FACEBOOK_APP_ID">321845908485447</string>
+    <string name="ACCOUNT_KIT_CLIENT_TOKEN">901154dd26663762a8dfb72d7d1f7ff0</string>
+    <string name="greeting">Tiệm Bánh Nghĩa\n Xin Chào!!</string>
+    <string name="address">Địa chỉ: Số 8 ngõ Thịnh Hào 1, Tôn Đức Thắng, Hà Nội</string>
+</resources>
