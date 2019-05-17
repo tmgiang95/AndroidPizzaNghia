@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
 
-public class Customer implements Serializable {
+public class Customer implements Serializable {http://demo.mozasolution.com/moza-econtent/backend/web/index.php/content/api/dashboard?fbclid=IwAR2WBtKS6A09HXJ8e1jnx1mL6Kg-yeEgMvSXYQJeaNx4_qQLzBgpEHbDBFU
     @SerializedName("customerid")
     private String customerid;
     @SerializedName("name")

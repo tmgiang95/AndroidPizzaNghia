@@ -1,16 +1,18 @@
 package com.example.pizza.homescreen;
 
+import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 
+import com.example.pizza.BaseActivity;
 import com.example.pizza.R;
 import com.example.pizza.login.MainActivity;
 import com.example.pizza.models.Customer;
+import com.example.pizza.productsinfo.ProductManagerActivity;
 import com.example.pizza.utils.APIClient;
 import com.example.pizza.utils.APIInterface;
 import com.facebook.accountkit.AccountKit;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 
 import android.util.Log;
 import android.view.View;
@@ -26,10 +28,14 @@ import androidx.drawerlayout.widget.DrawerLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.Menu;
 import android.widget.TextView;
 
+
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -38,10 +44,15 @@ import retrofit2.Response;
 
 import static com.example.pizza.login.MainActivity.USER_INFORMATION;
 
-public class HomeActivity extends AppCompatActivity
+public class HomeActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     TextView tvUsername;
     TextView tvUserphone;
+    private RecyclerView rvCustomer;
+    private ArrayList<Customer> customers = new ArrayList<>();
+    private CustomerAdapter adapter;
+    private APIInterface apiInterface = APIClient.getClient().create(APIInterface.class);
+    private Dialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,19 +62,47 @@ public class HomeActivity extends AppCompatActivity
         Customer customer = (Customer) getIntent().getSerializableExtra(USER_INFORMATION);
         tvUsername.setText(customer.getName());
         tvUserphone.setText(customer.getPhone());
+
+        rvCustomer = findViewById(R.id.rvCustomer);
+        adapter = new CustomerAdapter(customers);
+        adapter.setOnCustomerClickListener(new CustomerHandler() {
+            @Override
+            public void onclick(Customer customer) {
+                DialogCash dialogCash = new DialogCash(HomeActivity.this,customer);
+                dialogCash.show();
+            }
+        });
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getBaseContext(), RecyclerView.VERTICAL, false);
+        rvCustomer.setLayoutManager(layoutManager);
+        rvCustomer.setAdapter(adapter);
+
+
+
+
+        doGetData();
+    }
+    private void doGetData() {
+        showProgressDialog();
+        Call<List<Customer>> call = apiInterface.doGetListCustomers();
+        call.enqueue(new Callback<List<Customer>>() {
+            @Override
+            public void onResponse(Call<List<Customer>> call, Response<List<Customer>> response) {
+                customers.addAll(response.body());
+                adapter.notifyDataSetChanged();
+                dismissProgressDialog();
+            }
+
+            @Override
+            public void onFailure(Call<List<Customer>> call, Throwable t) {
+                Log.d("giangtm1", "DoGetAllCustomer - onFailure: " + t.getMessage());
+            }
+        });
     }
 
     private void configNavigation() {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -89,7 +128,7 @@ public class HomeActivity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.home, menu);
+        getMenuInflater().inflate(R.menu.menu_search, menu);
         return true;
     }
 
@@ -100,7 +139,7 @@ public class HomeActivity extends AppCompatActivity
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_search) {
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -116,6 +155,8 @@ public class HomeActivity extends AppCompatActivity
                 startActivity(new Intent(getBaseContext(), MainActivity.class));
                 finish();
                 break;
+            case R.id.nav_product:
+                startActivity(new Intent(getBaseContext(), ProductManagerActivity.class));
             default:
                 break;
         }
